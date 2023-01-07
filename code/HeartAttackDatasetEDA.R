@@ -1,8 +1,7 @@
-dataHeart<-read.csv("./heart.csv",header=T,sep=",")
+dataHeart<-read.csv("heart.csv",header=T,sep=",")
 attach(dataHeart)
 
 
-dim(data)
 
 str(dataHeart)
 head(dataHeart)
@@ -127,10 +126,6 @@ title <- "DataHeart correlation"
 corrplot(res,method="color",tl.col="black", tl.srt=30, order = "AOE",title = title,
          number.cex=0.75,sig.level = 0.01, addCoef.col = "black",mar=c(0,0,1,0))
 
-
-missing <- data[is.na(dataHeart),]
-dim(missing)
-
 boxplot(x = dataHeart$age,main='Variable age')
 boxplot(x = dataHeart$trtbps,main='Variable trtbps')
 boxplot(x = dataHeart$thalachh,main='Variable thalachh')
@@ -158,3 +153,29 @@ legend('topright', c('Output TRUE', 'Output FALSE'),
        fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
 
 
+
+test_grafica<-dataHeart %>%
+  group_by(exng) %>%
+  count(sex)%>%
+  mutate(porcentaje=scales::percent(n/sum(n)))
+
+ggplot(test_grafica,aes(x=exng , y=n, fill=sex))+
+  geom_bar(stat="identity", position="dodge")+
+  geom_text(aes(label=porcentaje),color="black", vjust=1.5, position = position_dodge(0.9))
+
+
+test_grafica<-dataHeart %>%
+  group_by(fbs) %>%
+  count(sex)%>%
+  mutate(porcentaje=scales::percent(n/sum(n)))
+
+ggplot(test_grafica,aes(x=fbs , y=n, fill=sex))+
+  geom_bar(stat="identity", position="dodge")+
+  geom_text(aes(label=porcentaje),color="black", vjust=1.5, position = position_dodge(0.9))
+
+
+
+hist(dataHeart$thalach [dataHeart$sex==TRUE], col=rgb(1,0,0,0.2))
+hist(dataHeart$thalach [dataHeart$sex==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
+legend('topright', c('Sex TRUE', 'Sex FALSE'),
+       fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
