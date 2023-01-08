@@ -179,3 +179,46 @@ hist(dataHeart$thalach [dataHeart$sex==TRUE], col=rgb(1,0,0,0.2))
 hist(dataHeart$thalach [dataHeart$sex==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
 legend('topright', c('Sex TRUE', 'Sex FALSE'),
        fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
+
+
+
+
+library(nortest)
+alpha = 0.05
+col.names = colnames(dataHeart)
+for (i in 1:ncol(dataHeart)) {
+  if (i == 1) cat("Variables que no siguen una distribución normal:\n")
+  if (is.integer(dataHeart[,i]) | is.numeric(dataHeart[,i])) {
+    p_val = ad.test(dataHeart[,i])$p.value
+    if (p_val < alpha) {
+      cat(col.names[i])
+      # Format output
+      if (i < ncol(dataHeart) - 1) cat(", ")
+      if (i %% 3 == 0) cat("\n")
+    }
+  }
+}
+
+##Correlaciones 
+if(!require("corrplot")) install.packages("corrplot"); library("corrplot")
+n = c("age","sex","cp","trtbps","chol","fbs","restecg","thalachh","exng","oldpeak","slp","caa","thall","output")
+factores= dataHeart %>% select(all_of(n))
+res<-cor(factores)
+corrplot(res,method="color",tl.col="black", tl.srt=30, order = "AOE",
+         number.cex=0.75,sig.level = 0.01, addCoef.col = "black")
+
+
+
+
+library(car)
+ModelF <- lm(output ~ sex+cp+fbs+restecg+exng+slp+caa+thall, data = dataHeart)
+car::vif(ModelF)
+
+
+
+ModlgF <- glm(output ~ age+sex+cp+trtbps+chol+fbs+restecg+thalachh+exng+oldpeak+slp+caa+thall+output
+              , data = dataHeart, family = "binomial")
+summary(ModlgF)
+
+vif(ModlgF)
+
