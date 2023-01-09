@@ -1,4 +1,5 @@
 dataHeart<-read.csv("./heart.csv",header=T,sep=",")
+dataHeartNumeric <- dataHeart
 attach(dataHeart)
 
 
@@ -152,8 +153,8 @@ summary(x$chol)
 dataHeart <- x
 
 
-dataHeart$Hcol <- cut(dataHeart$chol, breaks = c(0,200,1000), labels = c(0,1))
 
+dataHeart$Hcol <- cut(dataHeart$chol, breaks = c(0,200,1000), labels = c(0,1))
 write.csv(dataHeart, "DataHeart_clean.csv", row.names=FALSE)
 
 
@@ -179,11 +180,6 @@ plot(rownames(ageVsAttack), ageVsAttack[,2], main="Scatterplot Age vs Heart atta
 lines(rownames(ageVsAttack), ageVsAttack[,2], type = "l", lty = 1)
 
 
-hist(dataHeart$output[dataHeart$output==TRUE], col=rgb(1,0,0,0.2),main="Cholesterol vs Heart Attack")
-hist(dataHeart$chol[dataHeart$output==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
-legend('topright', c('Output TRUE', 'Output FALSE'),
-       fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
-
 
 library(nortest)
 alpha = 0.05
@@ -204,7 +200,7 @@ for (i in 1:ncol(dataHeart)) {
 ##Correlaciones 
 if(!require("corrplot")) install.packages("corrplot"); library("corrplot")
 n = c("age","sex","cp","trtbps","chol","fbs","restecg","thalachh","exng","oldpeak","slp","caa","thall","output")
-factores= dataHeart %>% select(all_of(n))
+factores= dataHeartNumeric %>% select(all_of(n))
 res<-cor(factores)
 corrplot(res,method="color",tl.col="black", tl.srt=30, order = "AOE",
          number.cex=0.75,sig.level = 0.01, addCoef.col = "black")
@@ -227,8 +223,8 @@ vif(ModlgF)
 
 
 
-
 fligner.test(thalachh ~ Hcol, data = dataHeart)
+
 
 
 
