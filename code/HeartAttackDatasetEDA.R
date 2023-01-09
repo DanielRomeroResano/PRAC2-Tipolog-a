@@ -1,7 +1,8 @@
-dataHeart<-read.csv("heart.csv",header=T,sep=",")
+dataHeart<-read.csv("./heart.csv",header=T,sep=",")
 attach(dataHeart)
 
 
+dim(data)
 
 str(dataHeart)
 head(dataHeart)
@@ -126,6 +127,10 @@ title <- "DataHeart correlation"
 corrplot(res,method="color",tl.col="black", tl.srt=30, order = "AOE",title = title,
          number.cex=0.75,sig.level = 0.01, addCoef.col = "black",mar=c(0,0,1,0))
 
+
+missing <- dataHeart[is.na(dataHeart),]
+dim(missing)
+
 boxplot(x = dataHeart$age,main='Variable age')
 boxplot(x = dataHeart$trtbps,main='Variable trtbps')
 boxplot(x = dataHeart$thalachh,main='Variable thalachh')
@@ -147,6 +152,12 @@ summary(x$chol)
 dataHeart <- x
 
 
+dataHeart$Hcol <- cut(dataHeart$chol, breaks = c(0,200,1000), labels = c(0,1))
+
+write.csv(dataHeart, "DataHeart_clean.csv", row.names=FALSE)
+
+
+
 hist(dataHeart$chol[dataHeart$output==TRUE], col=rgb(1,0,0,0.2),main="Cholesterol vs Heart Attack")
 hist(dataHeart$chol[dataHeart$output==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
 legend('topright', c('Output TRUE', 'Output FALSE'),
@@ -154,33 +165,24 @@ legend('topright', c('Output TRUE', 'Output FALSE'),
 
 
 
-test_grafica<-dataHeart %>%
-  group_by(exng) %>%
-  count(sex)%>%
-  mutate(porcentaje=scales::percent(n/sum(n)))
-
-ggplot(test_grafica,aes(x=exng , y=n, fill=sex))+
-  geom_bar(stat="identity", position="dodge")+
-  geom_text(aes(label=porcentaje),color="black", vjust=1.5, position = position_dodge(0.9))
-
-
-test_grafica<-dataHeart %>%
-  group_by(fbs) %>%
-  count(sex)%>%
-  mutate(porcentaje=scales::percent(n/sum(n)))
-
-ggplot(test_grafica,aes(x=fbs , y=n, fill=sex))+
-  geom_bar(stat="identity", position="dodge")+
-  geom_text(aes(label=porcentaje),color="black", vjust=1.5, position = position_dodge(0.9))
-
-
-
-hist(dataHeart$thalach [dataHeart$sex==TRUE], col=rgb(1,0,0,0.2))
-hist(dataHeart$thalach [dataHeart$sex==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
-legend('topright', c('Sex TRUE', 'Sex FALSE'),
+hist(dataHeart$trtbps[dataHeart$output==TRUE], col=rgb(1,0,0,0.2),main="Blood Pressure vs Heart Attack")
+hist(dataHeart$trtbps[dataHeart$output==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
+legend('topright', c('Output TRUE', 'Output FALSE'),
        fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
 
 
+
+
+length(dataHeart$output[output==1])
+ageVsAttack <- table(dataHeart$age, dataHeart$output)
+plot(rownames(ageVsAttack), ageVsAttack[,2], main="Scatterplot Age vs Heart attack risk ", xlab="Age", ylab="Heart attack true count", pch=19,col="dodgerblue1")
+lines(rownames(ageVsAttack), ageVsAttack[,2], type = "l", lty = 1)
+
+
+hist(dataHeart$output[dataHeart$output==TRUE], col=rgb(1,0,0,0.2),main="Cholesterol vs Heart Attack")
+hist(dataHeart$chol[dataHeart$output==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
+legend('topright', c('Output TRUE', 'Output FALSE'),
+       fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
 
 
 library(nortest)
@@ -221,4 +223,21 @@ ModlgF <- glm(output ~ age+sex+cp+trtbps+chol+fbs+restecg+thalachh+exng+oldpeak+
 summary(ModlgF)
 
 vif(ModlgF)
+
+
+
+
+
+fligner.test(thalachh ~ Hcol, data = dataHeart)
+
+
+
+dataHeartCholH <- dataHeart[dataHeart$chol >= 200,]
+dataHeartCholL <- dataHeart[dataHeart$chol < 200,]
+
+t.test(dataHeartCholL$thalachh,dataHeartCholH$thalachh, alternative = "less")
+
+summary (dataHeartCholH)
+summary (dataHeartCholL)
+
 
