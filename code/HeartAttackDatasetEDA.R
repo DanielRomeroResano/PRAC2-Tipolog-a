@@ -164,6 +164,20 @@ hist(dataHeart$chol[dataHeart$output==FALSE], col=rgb(0,0,1,0.2), add=TRUE)
 legend('topright', c('Output TRUE', 'Output FALSE'),
        fill=c(rgb(1,0,0,0.2),rgb(0,0,1,0.2)), xpd=TRUE, cex=0.7,)
 
+test_grafica<-dataHeart %>%
+  group_by(exng) %>%
+  count(sex)%>%
+  mutate(porcentaje=scales::percent(n/sum(n)))
+ggplot(test_grafica,aes(x=exng , y=n, fill=sex))+
+  geom_bar(stat="identity", position="dodge")+
+  geom_text(aes(label=porcentaje),color="black", vjust=1.5, position = position_dodge(0.9))
+test_grafica<-dataHeart %>%
+  group_by(fbs) %>%
+  count(sex)%>%
+  mutate(porcentaje=scales::percent(n/sum(n)))
+ggplot(test_grafica,aes(x=fbs , y=n, fill=sex))+
+  geom_bar(stat="identity", position="dodge")+
+  geom_text(aes(label=porcentaje),color="black", vjust=1.5, position = position_dodge(0.9))
 
 
 hist(dataHeart$trtbps[dataHeart$output==TRUE], col=rgb(1,0,0,0.2),main="Blood Pressure vs Heart Attack")
@@ -235,5 +249,3 @@ t.test(dataHeartCholL$thalachh,dataHeartCholH$thalachh, alternative = "less")
 
 summary (dataHeartCholH)
 summary (dataHeartCholL)
-
-
